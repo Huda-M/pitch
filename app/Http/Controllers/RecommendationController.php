@@ -3,64 +3,49 @@
 namespace App\Http\Controllers;
 
 use App\Models\Recommendation;
-use App\Http\Requests\StoreRecommendationRequest;
-use App\Http\Requests\UpdateRecommendationRequest;
+use Illuminate\Http\Request;
 
 class RecommendationController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        return Recommendation::with(['score', 'investor'])->latest()->get();
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function store(Request $request)
     {
-        //
+        $data = $request->validate([
+            'score_id' => 'required|exists:scores,id',
+            'investor_id' => 'required|exists:investors,id',
+            'match_score' => 'required|integer|min:0|max:100',
+        ]);
+
+        $rec = Recommendation::create($data);
+        return response()->json($rec, 201);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreRecommendationRequest $request)
+    public function show($id)
     {
-        //
+        return Recommendation::with(['score', 'investor'])->findOrFail($id);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Recommendation $recommendation)
+    public function update(Request $request, $id)
     {
-        //
+        $rec = Recommendation::findOrFail($id);
+
+        $data = $request->validate([
+            'score_id' => 'sometimes|exists:scores,id',
+            'investor_id' => 'sometimes|exists:investors,id',
+            'match_score' => 'sometimes|integer|min:0|max:100',
+        ]);
+
+        $rec->update($data);
+        return response()->json($rec);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Recommendation $recommendation)
+    public function destroy($id)
     {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateRecommendationRequest $request, Recommendation $recommendation)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Recommendation $recommendation)
-    {
-        //
+        Recommendation::findOrFail($id)->delete();
+        return response()->json(['message' => 'Deleted successfully']);
     }
 }

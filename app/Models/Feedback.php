@@ -7,6 +7,17 @@ use Illuminate\Database\Eloquent\Model;
 
 class Feedback extends Model
 {
-    /** @use HasFactory<\Database\Factories\FeedbackFactory> */
     use HasFactory;
+
+    protected $fillable = [
+        'pitch_id',
+        'pdf_path',
+    ];
+
+    public function pitch()
+    {
+        return $this->belongsTo(Pitch::class);
+    }
 }
+
+
