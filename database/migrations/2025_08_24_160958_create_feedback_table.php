@@ -6,24 +6,19 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('feedback', function (Blueprint $table) {
             $table->id();
-            $table->string('pdf_path');
-            $table->foreignId('pitch_id')->constrained();
+            $table->string('pdf_path');   
+            $table->foreignId('pitch_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('feedback');
     }
 };
+

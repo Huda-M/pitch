@@ -3,64 +3,54 @@
 namespace App\Http\Controllers;
 
 use App\Models\Investors;
-use App\Http\Requests\StoreInvestorsRequest;
-use App\Http\Requests\UpdateInvestorsRequest;
+use Illuminate\Http\Request;
 
 class InvestorsController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        return Investors::latest()->get();
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function store(Request $request)
     {
-        //
+        $data = $request->validate([
+            'focus_field' => 'required|string|max:255',
+            'company' => 'required|string|max:255',
+            'min_charge' => 'required|integer|min:0',
+            'max_charge' => 'required|integer|min:0|gte:min_charge',
+            'user_id' => 'required|exists:users,id',
+        ]);
+
+        $inv = Investors::create($data);
+        return response()->json($inv, 201);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreInvestorsRequest $request)
+    public function show($id)
     {
-        //
+        return Investors::findOrFail($id);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Investors $investors)
+    public function update(Request $request, $id)
     {
-        //
+        $data = $request->validate([
+            'focus_field' => 'sometimes|string|max:255',
+            'company' => 'sometimes|string|max:255',
+            'min_charge' => 'sometimes|integer|min:0',
+            'max_charge' => 'sometimes|integer|min:0|gte:min_charge',
+            'user_id' => 'sometimes|exists:users,id',
+        ]);
+
+        $inv = Investors::findOrFail($id);
+        $inv->update($data);
+
+        return response()->json($inv);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Investors $investors)
+    public function destroy($id)
     {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateInvestorsRequest $request, Investors $investors)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Investors $investors)
-    {
-        //
+        Investors::findOrFail($id)->delete();
+        return response()->json(['message' => 'Deleted successfully']);
     }
 }
+
