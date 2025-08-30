@@ -14,15 +14,17 @@ return new class extends Migration
         Schema::create('scores', function (Blueprint $table) {
             $table->id();
             $table->integer('market_score');
-            $table->integer('financial_score');
             $table->integer('competition_score');
-            $table->integer('overall_score');
-            $table->json('recommendations');
             $table->integer('problem_score');
+            $table->integer('Business_Model_score');
             $table->integer('solution_score');
-            $table->integer('market_strategy_score');
+            $table->integer('GTM_strategy_score');
             $table->integer('traction_score');
             $table->integer('team_score');
+            $table->integer('product_tech_stack_score');
+            $table->integer('traction_results_score');
+            $table->integer('financials_investment_score');
+            $table->integer('overall_score');
             $table->foreignId('pitch_id')->constrained();
             $table->timestamps();
         });

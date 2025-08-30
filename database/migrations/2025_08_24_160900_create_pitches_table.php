@@ -17,11 +17,11 @@ return new class extends Migration
             $table->text('problem');
             $table->text('solution');
             $table->text('market');
-            $table->text('product');
+            $table->text('product_tech_stack');
             $table->text('business_model');
             $table->text('competition');
             $table->text('market_strategy');
-            $table->text('results');
+            $table->text('traction_results');
             $table->text('team_info');
             $table->text('financials_investment');
             $table->enum("status",['draft', 'submitted', 'scored']);
