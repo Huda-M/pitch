@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
 class UpdatePitchRequest extends FormRequest
 {
@@ -11,7 +12,7 @@ class UpdatePitchRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return Auth::check()&&(Auth::user()->isAdmin()||Auth::user()->isFounder());
     }
 
     /**
@@ -22,7 +23,29 @@ class UpdatePitchRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'title'=>'required|string',
+            'problem'=>"required|string",
+            'solution'=>"required|string",
+            'market'=>"required|string",
+            'product_tech_stack'=>"required|string",
+            'business_model'=>"required|string",
+            'competition'=>"required|string",
+            'market_strategy'=>"required|string",
+            'traction_results'=>"required|string",
+            'team_info'=>"required|string",
+            'financials_investment'=>"required|string",
+            'status'=>"required|in:submitted,draft,scored",
+            'field_id'=>"required|exists:fields,id",
+            'stage_id'=>"required|exists:stages,id",
+        ];
+    }
+    public function messages():array{
+        return [
+            '*.required'=>"the value must be choosen",
+            '*.string'=>"the value must string",
+            'status.in'=>"the value must submitted or draft or scored",
+            'field_id.exists'=>"this field does not exist",
+            'stage_id.exists'=>"this stage does not exist",
         ];
     }
 }

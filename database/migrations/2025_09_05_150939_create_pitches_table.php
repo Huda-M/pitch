@@ -26,6 +26,8 @@ return new class extends Migration
             $table->text('financials_investment');
             $table->enum("status",['draft', 'submitted', 'scored']);
             $table->foreignId('user_id')->constrained();
+            $table->foreignId('field_id')->constrained();
+            $table->foreignId('stage_id')->constrained();
             $table->timestamps();
         });
     }

@@ -85,7 +85,7 @@ return [
                 'smtp',
                 'log',
             ],
-            'retry_after' => 60,
+            'retry_after' =>60 ,
         ],
 
         'roundrobin' => [

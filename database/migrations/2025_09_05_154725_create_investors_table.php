@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('investors', function (Blueprint $table) {
             $table->id();
-            $table->string('focus_field');
             $table->string('company');
-            $table->integer('min_charge');
-            $table->integer('max_charge');
+            $table->string('thesis_text');
+            $table->integer('ticket_min_usd');
+            $table->integer('ticket_max_usd');
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });

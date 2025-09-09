@@ -3,15 +3,16 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
-class UpdateFeedbackRequest extends FormRequest
+class StoreFieldsInvestorsRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return false;
+        return Auth::check()&&Auth::user()->isInvestor();
     }
 
     /**
@@ -22,7 +23,8 @@ class UpdateFeedbackRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'field_id'=>"required|exists:fields,id",
+            'investor_id'=>"required|exists:investors,id",
         ];
     }
 }

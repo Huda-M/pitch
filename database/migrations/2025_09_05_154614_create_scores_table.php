@@ -16,7 +16,7 @@ return new class extends Migration
             $table->integer('market_score');
             $table->integer('competition_score');
             $table->integer('problem_score');
-            $table->integer('Business_Model_score');
+            $table->integer('business_model_score');
             $table->integer('solution_score');
             $table->integer('GTM_strategy_score');
             $table->integer('traction_score');
@@ -26,6 +26,7 @@ return new class extends Migration
             $table->integer('financials_investment_score');
             $table->integer('overall_score');
             $table->foreignId('pitch_id')->constrained();
+            $table->foreignId('pitch_text_id')->constrained();
             $table->timestamps();
         });
     }

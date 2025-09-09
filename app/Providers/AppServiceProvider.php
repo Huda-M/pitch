@@ -4,6 +4,9 @@ namespace App\Providers;
 
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\ServiceProvider;
+    use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\App;
+
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -23,5 +26,22 @@ class AppServiceProvider extends ServiceProvider
         ResetPassword::createUrlUsing(function (object $notifiable, string $token) {
             return config('app.frontend_url')."/password-reset/$token?email={$notifiable->getEmailForPasswordReset()}";
         });
+        if (isset($_SERVER['HTTP_X_ORIGINAL_HOST'])) {
+        URL::forceRootUrl('https://'.$_SERVER['HTTP_X_ORIGINAL_HOST']);
+    } elseif (isset($_SERVER['HTTP_X_FORWARDED_HOST'])) {
+        URL::forceRootUrl('https://'.$_SERVER['HTTP_X_FORWARDED_HOST']);
+    }
+
+    // إعدادات الجلسة لتعمل مع ngrok
+    config(['session.domain' => '.ngrok-free.app']);
     }
 }
+
+// public function boot()
+// {
+//     // استخدام العنوان المحلي في البيئة المحلية
+//     if (App::environment('local')) {
+//         URL::forceRootUrl(config('app.url'));
+//     }
+// }
+

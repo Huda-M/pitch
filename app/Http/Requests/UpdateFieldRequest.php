@@ -3,15 +3,16 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
-class StoreRecommendationRequest extends FormRequest
+class UpdateFieldRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return false;
+        return Auth::check()&&Auth::user()->isAdmin();
     }
 
     /**
@@ -22,7 +23,13 @@ class StoreRecommendationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name'=>'required|string',
+        ];
+    }
+    public function messages():array{
+        return [
+            'name.required'=>"the value must be choosen",
+            'name.string'=>"the value must string",
         ];
     }
 }
