@@ -32,9 +32,6 @@ class StagesInvestorsController extends Controller
             if ($request->has('stage_id')){
                 $query->where('stage_id',$request->stage_id);
             }
-            // if ($request->has('investor_id')||($request->has('investor_id') && Auth::user()->isAdmin())||(Auth::user()->isInvestor() && !Auth::user()->isAdmin())){
-            //     $query->where('investor_id',Auth::user()->investor_id);
-            // }
             $stagesInvestors=$query->orderBy('created_at','desc')->paginate($request->per_page??10);
             return response()->json([
                 'success'=>true,

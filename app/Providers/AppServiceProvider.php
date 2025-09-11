@@ -32,8 +32,6 @@ class AppServiceProvider extends ServiceProvider
     } elseif (isset($_SERVER['HTTP_X_FORWARDED_HOST'])) {
         URL::forceRootUrl('https://'.$_SERVER['HTTP_X_FORWARDED_HOST']);
     }
-
-    // إعدادات الجلسة لتعمل مع ngrok
     config(['session.domain' => '.ngrok-free.app']);
     config(['sanctum.stateful' => [$_SERVER['HTTP_X_ORIGINAL_HOST'] ?? $_SERVER['HTTP_X_FORWARDED_HOST'] ?? 'localhost']]);
 }

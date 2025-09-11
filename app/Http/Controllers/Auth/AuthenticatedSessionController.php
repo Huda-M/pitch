@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
-use App\Models\User; // Add this import
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -13,7 +13,6 @@ class AuthenticatedSessionController extends Controller
 {
     public function store(LoginRequest $request): JsonResponse
     {
-        // البحث عن المستخدم بالبريد الإلكتروني
         $user = User::where('email', $request->email)->first();
 
         if (!$user) {
@@ -22,7 +21,6 @@ class AuthenticatedSessionController extends Controller
             ], 401);
         }
 
-        // التحقق إذا كان البريد الإلكتروني مفعلاً
         if (!$user->hasVerifiedEmail()) {
             return response()->json([
                 'message' => 'Please verify your email before logging in.',
@@ -31,7 +29,6 @@ class AuthenticatedSessionController extends Controller
             ], 403);
         }
 
-        // التحقق إذا كان المستخدم يحتاج إلى تعيين كلمة مرور
         if (!$user->hasPassword()) {
             return response()->json([
                 'message' => 'Please set your password before logging in.',
@@ -40,7 +37,6 @@ class AuthenticatedSessionController extends Controller
             ], 403);
         }
 
-        // محاولة المصادقة بكلمة المرور
         if (!Auth::attempt($request->only('email', 'password'))) {
             return response()->json([
                 'message' => 'The provided credentials are incorrect.'

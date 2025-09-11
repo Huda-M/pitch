@@ -20,7 +20,6 @@ class RegisteredUserController extends Controller
 ]);
 
         try {
-            // إنشاء يوزر جديد
             $verificationCode = rand(1000, 9999);
             $user = User::create([
                 'name' => $request->name,
@@ -31,14 +30,8 @@ class RegisteredUserController extends Controller
                 'verification_code' => $verificationCode,
                 'verification_code_sent_at' => now(),
             ]);
-
-            // إطلاق حدث التسجيل
             event(new Registered($user));
-
-            // إرسال كود التحقق
             $user->notify(new \App\Notifications\VerificationCodeNotification($verificationCode));
-
-            // Log للتأكد
             Log::info('User registered and verification code sent', [
                 'user_id' => $user->id,
                 'email' => $user->email,
