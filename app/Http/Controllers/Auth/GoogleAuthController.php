@@ -34,35 +34,54 @@ class GoogleAuthController extends Controller
     }
 
     public function callback(Request $request)
-    {
-        try {
-            if (!$request->has('code')) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Missing authorization code from Google'
-                ], 400);
-            }
-            $googleUser = Socialite::driver('google')
-                ->stateless()
-                ->user();
-            $user = User::firstOrCreate(
-                ['email' => $googleUser->email],
-                [
-                    'name' => $googleUser->name,
-                    'password' => Hash::make(Str::random(16)),
-                    'role' => 'founder',
-                    'email_verified_at' => now(),
-                ]
-            );
-            $redirectUri = 'com.example.app://auth-callback';
-            $deepLink = $redirectUri . '?token=$token&user_id=' . $user->id;
-            return redirect()->away($deepLink);
-        } catch (\Exception $e) {
-            Log::error('Google auth error: ' . $e->getMessage());
+{
+    try {
+        if (!$request->has('code')) {
             return response()->json([
-            'success' => false,
-            'message' => 'Failed to authenticate with Google'
-            ], 500);
+                'success' => false,
+                'message' => 'Missing authorization code from Google'
+            ], 400);
         }
+
+        $googleUser = Socialite::driver('google')
+            ->stateless()
+            ->user();
+
+        $user = User::firstOrCreate(
+            ['email' => $googleUser->email],
+            [
+                'name' => $googleUser->name,
+                'password' => Hash::make(Str::random(16)),
+                'role' => 'founder',
+                'email_verified_at' => now(),
+            ]
+        );
+
+        // إنشاء توكن للمستخدم
+        $token = $user->createToken('api-token')->plainTextToken;
+
+        // بناء رابط التوجيه مع البيانات كـ query parameters
+        $redirectUrl = config('http://com.example.app', 'http://localhost:3000') . '/auth/callback?' . http_build_query([
+            'token' => $token,
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'success' => 'true'
+        ]);
+
+        return redirect()->away($redirectUrl);
+
+    } catch (\Exception $e) {
+        Log::error('Google auth error: ' . $e->getMessage());
+
+        // في حالة الخطأ، نوجه إلى صفحة الخطأ مع رسالة الخطأ
+        $errorRedirectUrl = config('http://com.example.app', 'http://localhost:3000') . '/auth/callback?' . http_build_query([
+            'success' => 'false',
+            'error' => 'Failed to authenticate with Google',
+            'message' => $e->getMessage()
+        ]);
+
+        return redirect()->away($errorRedirectUrl);
     }
+}
 }

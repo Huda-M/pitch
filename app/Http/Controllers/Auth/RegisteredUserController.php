@@ -7,7 +7,7 @@ use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rules;
 
 class RegisteredUserController extends Controller
@@ -15,27 +15,47 @@ class RegisteredUserController extends Controller
     public function store(Request $request): JsonResponse
     {
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'password' => ['required', 'confirmed', Rules\Password::min(8)],
-            'role' => ['required', 'in:admin,founder,investor']
-        ]);
-        $verificationCode = rand(1000, 9999);
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => $request->role,
-            'email_verified_at' => null,
-            'verification_code' => $verificationCode,
-            'verification_code_sent_at' => now(),
-        ]);
-        event(new Registered($user));
-        $this->sendVerificationCode($user, $verificationCode);
-        return response()->json([
-            'message' => 'Registration successful. Verification code sent to your email.',
-            'user_id' => $user->id
-        ], 201);
+    'name' => ['required', 'string', 'max:255'],
+    'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
+]);
+
+        try {
+            // إنشاء يوزر جديد
+            $verificationCode = rand(1000, 9999);
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => null,
+                'role' => 'founder',
+                'email_verified_at' => null,
+                'verification_code' => $verificationCode,
+                'verification_code_sent_at' => now(),
+            ]);
+
+            // إطلاق حدث التسجيل
+            event(new Registered($user));
+
+            // إرسال كود التحقق
+            $user->notify(new \App\Notifications\VerificationCodeNotification($verificationCode));
+
+            // Log للتأكد
+            Log::info('User registered and verification code sent', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'verification_code' => $verificationCode
+            ]);
+
+            return response()->json([
+                'message' => 'Registration successful. Verification code sent to your email.',
+                'user_id' => $user->id,
+                'needs_verification' => true
+            ], 201);
+        } catch (\Exception $e) {
+            Log::error('Registration failed', ['error' => $e->getMessage()]);
+            return response()->json([
+                'message' => 'Registration failed: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     private function sendVerificationCode($user, $code)

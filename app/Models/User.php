@@ -39,6 +39,9 @@ class User extends Authenticatable
         'remember_token',
         'verification_code',
     ];
+    protected $attributes = [
+        'role' => 'founder',
+    ];
 
     protected $casts = [
         'email_verified_at' => 'datetime',
@@ -46,6 +49,20 @@ class User extends Authenticatable
         'password_reset_code_sent_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    // في ملف User.php
+// إضافة هذه الدالة للتحقق من وجود كلمة مرور
+public function hasPassword(): bool
+{
+    return !empty($this->password);
+}
+
+
+// استبدل الدالة الحالية بهذه
+public function needsPassword(): bool
+{
+    return empty($this->password) && !$this->hasVerifiedEmail();
+}
 
     public function sendPasswordResetCode(): void
 {

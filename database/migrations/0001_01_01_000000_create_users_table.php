@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable();
-            $table->enum("role",['admin','investor','founder']);
+            $table->enum("role",['admin','investor','founder'])->default('founder');;
             $table->string('verification_code')->nullable();
             $table->timestamp('verification_code_sent_at')->nullable();
             $table->string('password_reset_code', 4)->nullable();

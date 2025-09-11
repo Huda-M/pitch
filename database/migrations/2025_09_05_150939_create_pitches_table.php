@@ -13,17 +13,16 @@ return new class extends Migration
     {
         Schema::create('pitches', function (Blueprint $table) {
             $table->id();
-            $table->text('title');
-            $table->text('problem');
-            $table->text('solution');
-            $table->text('market');
-            $table->text('product_tech_stack');
-            $table->text('business_model');
-            $table->text('competition');
-            $table->text('market_strategy');
-            $table->text('traction_results');
-            $table->text('team_info');
-            $table->text('financials_investment');
+            $table->text('Problem');
+            $table->text('Solution');
+            $table->text('Market');
+            $table->text('Product / Tech Stack');
+            $table->text('Business Model');
+            $table->text('Competition');
+            $table->text('Market Strategy');
+            $table->text('Traction /Results');
+            $table->text('Team Info');
+            $table->text('Financials & Investment Ask');
             $table->enum("status",['draft', 'submitted', 'scored']);
             $table->foreignId('user_id')->constrained();
             $table->foreignId('field_id')->constrained();

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Models\User; // Add this import
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -12,23 +13,43 @@ class AuthenticatedSessionController extends Controller
 {
     public function store(LoginRequest $request): JsonResponse
     {
-        $request->authenticate();
-        $user = $request->user();
-        if (!$user->hasVerifiedEmail()) {
-            if ($request->has('resend_verification')) {
-                $user->sendEmailVerificationNotification();
-                return response()->json([
-                    'message' => 'Verification link sent again. Please check your email.',
-                    'verified' => false
-                ], 403);
-            }
+        // البحث عن المستخدم بالبريد الإلكتروني
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
             return response()->json([
-                'message' => 'Please confirm your email before logging in.',
+                'message' => 'The provided credentials are incorrect.'
+            ], 401);
+        }
+
+        // التحقق إذا كان البريد الإلكتروني مفعلاً
+        if (!$user->hasVerifiedEmail()) {
+            return response()->json([
+                'message' => 'Please verify your email before logging in.',
                 'verified' => false,
                 'user_id' => $user->id
             ], 403);
         }
+
+        // التحقق إذا كان المستخدم يحتاج إلى تعيين كلمة مرور
+        if (!$user->hasPassword()) {
+            return response()->json([
+                'message' => 'Please set your password before logging in.',
+                'needs_password' => true,
+                'user_id' => $user->id
+            ], 403);
+        }
+
+        // محاولة المصادقة بكلمة المرور
+        if (!Auth::attempt($request->only('email', 'password'))) {
+            return response()->json([
+                'message' => 'The provided credentials are incorrect.'
+            ], 401);
+        }
+
+        $user = $request->user();
         $token = $user->createToken('api-token')->plainTextToken;
+
         return response()->json([
             'user' => $user,
             'token' => $token,

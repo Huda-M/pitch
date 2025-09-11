@@ -15,7 +15,7 @@ return [
     |
     */
     'paths' => ['api/*', 'sanctum/csrf-cookie'],
-'allowed_origins' => ['https://9ef2d6074f2c.ngrok-free.app', 'http://localhost:3000'],
+'allowed_origins' => ['https://db9bb7b61d27.ngrok-free.app', 'http://localhost:3000'],
 'allowed_methods' => ['*'],
 'allowed_headers' => ['*'],
 'supports_credentials' => true,

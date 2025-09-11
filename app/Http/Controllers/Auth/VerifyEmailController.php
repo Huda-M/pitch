@@ -13,14 +13,14 @@ class VerifyEmailController extends Controller
     {
         if ($request->user()->hasVerifiedEmail()) {
             return redirect()->away(
-                config('app.frontend_url', 'http://localhost:3000') .'/login?verified=1&message=Email already verified'
+                config('http://com.example.app', 'http://localhost:3000') .'/login?verified=1&message=Email already verified'
             );
         }
         if ($request->user()->markEmailAsVerified()) {
             event(new Verified($request->user()));
         }
         return redirect()->away(
-            config('app.frontend_url', 'http://localhost:3000') .'/login?verified=1&message=Email verified successfully'
+            config('http://com.example.app', 'http://localhost:3000') .'/login?verified=1&message=Email verified successfully'
         );
     }
 }
